@@ -3,5 +3,9 @@ main = "worker/index.ts"
 compatibility_date = "2026-09-01"
 workers_dev = true
 
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
 [vars]
-AGENTBRIDGE_ORIGIN = "https://shop.example.com"
+AGENTBRIDGE_ORIGIN = "https://agent-bridge-external-web-mcp-power.vercel.app"
