@@ -1,6 +1,6 @@
-name = "agentbridge-webmcp-adapter"
+name = "agentbridge--external-webmcp-api-adapter"
 main = "worker/index.ts"
-compatibility_date = "2026-09-02"
+compatibility_date = "2026-09-01"
 workers_dev = true
 
 [vars]
