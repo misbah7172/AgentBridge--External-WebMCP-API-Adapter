@@ -1,0 +1,1 @@
+{ "compilerOptions": { "target": "ES2022", "module": "ESNext", "moduleResolution": "Bundler", "strict": true, "noEmit": true, "baseUrl": "./src", "paths": { "@/*": ["*"] }, "types": ["node"] }, "include": ["src", "tests"], "exclude": ["worker", "src/bridge"] }

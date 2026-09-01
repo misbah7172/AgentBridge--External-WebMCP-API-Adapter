@@ -1,0 +1,1 @@
+{ "extends": "./tsconfig.json", "compilerOptions": { "lib": ["ES2022"], "types": ["@cloudflare/workers-types"], "skipLibCheck": true }, "include": ["src/config", "src/auth", "src/security", "src/executors", "src/tools", "src/registry", "worker"], "exclude": ["src/bridge", "tests"] }
