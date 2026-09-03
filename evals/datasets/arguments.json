@@ -1,0 +1,4 @@
+[
+  { "id": "arguments-add", "prompt": "Add product PROD-1 to my cart, quantity two.", "availableTools": ["add_to_cart"], "expectedCalls": [{ "name": "add_to_cart", "arguments": { "productId": "PROD-1", "quantity": 2 } }] },
+  { "id": "arguments-shipping", "prompt": "Estimate shipping to 10001, US.", "availableTools": ["get_shipping_estimate"], "expectedCalls": [{ "name": "get_shipping_estimate", "arguments": { "postalCode": "10001", "country": "US" } }] }
+]

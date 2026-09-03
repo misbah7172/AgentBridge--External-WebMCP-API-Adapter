@@ -1,0 +1,5 @@
+[
+  { "id": "selection-search", "prompt": "Find an ergonomic wireless mouse.", "availableTools": ["search_products", "filter_products"], "expectedCalls": [{ "name": "search_products", "arguments": { "query": "ergonomic wireless mouse" } }] },
+  { "id": "selection-cart", "prompt": "What is in my cart?", "availableTools": ["get_cart", "add_to_cart"], "expectedCalls": [{ "name": "get_cart", "arguments": {} }] },
+  { "id": "selection-negative", "prompt": "What is your return policy?", "availableTools": ["search_products", "get_cart"], "expectedCalls": [] }
+]

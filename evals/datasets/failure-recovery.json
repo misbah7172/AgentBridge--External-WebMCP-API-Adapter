@@ -1,0 +1,4 @@
+[
+  { "id": "recovery-auth", "prompt": "Show my cart.", "availableTools": ["get_cart"], "expectedCalls": [{ "name": "get_cart" }], "expectedRecovery": "request_login" },
+  { "id": "recovery-invalid-cart-id", "prompt": "Remove a cart item using an unknown item ID.", "availableTools": ["remove_from_cart"], "expectedCalls": [{ "name": "remove_from_cart" }], "expectedRecovery": "report_not_found" }
+]

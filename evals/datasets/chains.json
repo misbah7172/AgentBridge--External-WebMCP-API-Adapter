@@ -1,0 +1,4 @@
+[
+  { "id": "chain-search-details", "prompt": "Find a keyboard and give me details for the best match.", "availableTools": ["search_products", "get_product_details"], "ordered": true, "expectedCalls": [{ "name": "search_products" }, { "name": "get_product_details" }] },
+  { "id": "chain-cart", "prompt": "Add the selected product to my cart then show my cart.", "availableTools": ["add_to_cart", "get_cart"], "ordered": true, "expectedCalls": [{ "name": "add_to_cart" }, { "name": "get_cart" }] }
+]
