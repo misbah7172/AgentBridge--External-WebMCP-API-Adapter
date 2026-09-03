@@ -39,11 +39,15 @@
     }});
   };
   const make = ([name, title, description, properties, required, execute]) => ({ name, title, description, properties, required, execute });
-  const tools = [
+  const publicTools = [
     ["search_products", "Search Products", "Search catalog products using text and optional filters.", { query: string, category: string, minPrice: number, maxPrice: number, brand: string, minRating: number, page: number, limit: number }, ["query"], a => api("/products/search", "GET", { ...a, q: a.query })],
     ["get_product_details", "Product Details", "Retrieve the details of a product by its product ID.", { productId: string }, ["productId"], a => api(`/products/${encodeURIComponent(a.productId)}`, "GET")],
     ["filter_products", "Filter Products", "Filter catalog products by category, price, brand, rating, or availability.", { category: string, minPrice: number, maxPrice: number, brand: string, minRating: number, availability: { type: "string", enum: ["in_stock", "all"] } }, [], a => api("/products/filter", "GET", a)],
     ["sort_products", "Sort Products", "Sort a catalog search result by price, rating, newest, or popularity.", { sort: { type: "string", enum: ["price_asc", "price_desc", "rating", "newest", "popularity"] }, query: string, category: string }, ["sort"], a => api("/products/search", "GET", { q: a.query, category: a.category, sort: a.sort })],
+    ["get_product_recommendations", "Product Recommendations", "Get catalog recommendations optionally narrowed by category or brand.", { category: string, brand: string }, [], a => api("/products/recommendations", "GET", a)],
+    ["get_shipping_estimate", "Shipping Estimate", "Estimate shipping for a postal code and two-letter country code.", { postalCode: string, country: string }, ["postalCode", "country"], a => api("/shipping/estimate", "GET", a)],
+  ].map(make);
+  const authenticatedTools = [
     ["get_cart", "Get Cart", "Retrieve the authenticated user's cart, including item IDs and totals.", {}, [], () => api("/cart", "GET", {}, true)],
     ["add_to_cart", "Add To Cart", "Add a product ID and optional variant to the authenticated user's cart.", { productId: string, variantId: string, quantity: number }, ["productId"], a => api("/cart/items", "POST", { ...a, quantity: a.quantity ?? 1 }, true)],
     ["get_wishlist", "Get Wishlist", "Retrieve the authenticated user's wishlist.", {}, [], () => api("/wishlist", "GET", {}, true)],
@@ -52,8 +56,6 @@
     ["get_order_history", "Order History", "Retrieve the authenticated user's order history.", {}, [], () => api("/orders", "GET", {}, true)],
     ["get_order_details", "Order Details", "Retrieve an order by the authenticated user's order ID.", { orderId: string }, ["orderId"], a => api(`/orders/${encodeURIComponent(a.orderId)}`, "GET", {}, true)],
     ["cancel_order", "Cancel Order", "Cancel an eligible order by order ID. This changes order state.", { orderId: string }, ["orderId"], a => api(`/orders/${encodeURIComponent(a.orderId)}/cancel`, "POST", {}, true)],
-    ["get_product_recommendations", "Product Recommendations", "Get catalog recommendations optionally narrowed by category or brand.", { category: string, brand: string }, [], a => api("/products/recommendations", "GET", a)],
-    ["get_shipping_estimate", "Shipping Estimate", "Estimate shipping for a postal code and two-letter country code.", { postalCode: string, country: string }, ["postalCode", "country"], a => api("/shipping/estimate", "GET", a)],
   ].map(make);
   const cartTools = [
     ["update_cart", "Update Cart", "Set the quantity for an existing cart item ID.", { itemId: string, quantity: number }, ["itemId", "quantity"], a => api(`/cart/items/${encodeURIComponent(a.itemId)}`, "PATCH", { quantity: a.quantity }, true)],
@@ -61,6 +63,10 @@
     ["apply_coupon", "Apply Coupon", "Apply a coupon code to a populated authenticated cart.", { code: string }, ["code"], a => api("/cart/coupon", "POST", a, true)],
   ].map(make);
   const enableCartTools = () => cartTools.forEach(register);
-  tools.forEach(register);
-  api("/cart", "GET", {}, true).then((cart) => { if (cart.success && cart.data?.items?.length) enableCartTools(); });
+  publicTools.forEach(register);
+  api("/auth/session", "GET").then((session) => {
+    if (!session.success || !session.data?.user) return;
+    authenticatedTools.forEach(register);
+    api("/cart", "GET", {}, true).then((cart) => { if (cart.success && cart.data?.items?.length) enableCartTools(); });
+  });
 })();

@@ -10,7 +10,7 @@ The Cloudflare Worker proxies the Next.js storefront. For HTML only, `HTMLRewrit
 
 ## Inventory and state
 
-The 17 canonical tools are catalog search/details/filter/sort/recommendations/shipping; cart read/add/update/remove/coupon; wishlist read/add/remove; and order history/details/cancel. `update_cart`, `remove_from_cart`, and `apply_coupon` register only after a populated authenticated cart is detected. Checkout is intentionally absent.
+The 17 canonical tools are catalog search/details/filter/sort/recommendations/shipping; cart read/add/update/remove/coupon; wishlist read/add/remove; and order history/details/cancel. Public tools register for every visitor. Authenticated tools register only after `/api/auth/session` confirms a user. `update_cart`, `remove_from_cart`, and `apply_coupon` register only after a populated authenticated cart is detected. Checkout is intentionally absent.
 
 ## Changes deliberately avoided
 

@@ -69,7 +69,7 @@ Search → details; search → add to cart → inspect cart; inspect cart → re
 
 ## 12. State-Aware Tool Exposure
 
-Cart mutation tools register after a populated cart is detected or an add succeeds. See [state model](docs/webmcp-state-model.md).
+Public catalog tools register for every visitor. Account, cart, wishlist, and order tools register only after `/api/auth/session` confirms a signed-in user; cart mutation tools register only after a populated cart is detected or an add succeeds. See [state model](docs/webmcp-state-model.md).
 
 ## 13. Error Handling & Safety
 
