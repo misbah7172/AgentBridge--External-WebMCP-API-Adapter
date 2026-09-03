@@ -12,6 +12,24 @@ Agents need stable semantic capabilities, not fragile click paths, while the ori
 
 The Worker injects the constrained [runtime bridge](public/__agentbridge-webmcp/bridge-v2.js), which calls the origin's existing same-origin APIs using the browser's authenticated session.
 
+## API Adapter classification
+
+This repository is an **API Adapter**. It transforms approved AgentBridge REST capabilities into browser-native WebMCP tools; it is not a UI or browser-automation adapter.
+
+```text
+Agent
+  ↑
+WebMCP tools
+  ↑
+External API Adapter — fetch() with credentials: "include"
+  ↑
+AgentBridge Website REST API
+```
+
+The companion [AgentBridge storefront repository](https://github.com/misbah7172/AgentBridge--External-WebMCP-Powered-E-Commerce-Platform-API) is the origin application. It exposes the `/api/*` routes and owns all business logic, authentication, and database access. This adapter calls those routes from the browser; it does not automate the website UI, access Neon directly, or bypass origin authorization. Playwright is used only for E2E validation.
+
+The original adapter design described 18 tools, including checkout. The deployed safe implementation exposes 17 tools because real-order checkout is intentionally omitted until the origin offers an isolated sandbox.
+
 ## 4. What is WebMCP?
 
 WebMCP lets a website expose tools to a browser-resident AI agent through `document.modelContext`.
