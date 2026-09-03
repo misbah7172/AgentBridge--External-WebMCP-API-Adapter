@@ -6,7 +6,7 @@ AgentBridge uses an external Worker-injected imperative WebMCP bridge over the e
 
 ## Measured status
 
-Deterministic validation passed **9/9 adapter tests** on 2026-09-03; the storefront's existing service suite passed **2/2 tests**. LLM metrics are **not measured** until `OPENAI_API_KEY` is configured and `npm run eval:webmcp` completes. V2 browser evidence is **pending redeployment and Inspector capture**. No browser-only baseline was measured.
+Deterministic validation passed **9/9 adapter tests** on 2026-09-03; the storefront's existing service suite passed **2/2 tests**. Chrome Network evidence confirms V2 Worker injection, `bridge-v2.js` delivery, and anonymous cart protection. LLM metrics are **not measured** until `OPENAI_API_KEY` is configured and `npm run eval:webmcp` completes. Inspector discovery and authenticated-flow capture remain pending. No browser-only baseline was measured.
 
 ## Reliable demo flow
 

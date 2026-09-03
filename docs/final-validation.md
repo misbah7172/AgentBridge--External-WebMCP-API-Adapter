@@ -11,7 +11,7 @@
 | LLM selection/arguments | Not measured: provider key absent. |
 | Browser E2E | Implemented but not measured: isolated endpoint, credentials, and local Playwright browser absent. |
 | Mid-chain safety | State-changing failures are structured; checkout is not exposed. |
-| Browser evidence | Historical v1 observation recorded; v2 Inspector recapture remains required after deployment. |
+| Browser evidence | V2 Worker injection, asset delivery, and anonymous cart protection are captured in `docs/evidence/`; Inspector schema/authenticated-flow capture remains required. |
 
 ## Status summary
 
