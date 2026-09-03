@@ -2,7 +2,7 @@
 
 ## 1. Project Overview
 
-An external Cloudflare Worker injects browser-native WebMCP tools into the AgentBridge storefront without changing its Next.js source.
+An external [Cloudflare Worker](worker/index.ts) injects browser-native WebMCP tools into the AgentBridge storefront without changing its Next.js source. The Worker receives browser traffic, proxies it to the configured origin, and adds the browser bridge only to HTML responses.
 
 ## 2. Problem Statement
 
@@ -10,7 +10,7 @@ Agents need stable semantic capabilities, not fragile click paths, while the ori
 
 ## 3. Solution / Approach
 
-The Worker injects a constrained imperative bridge that calls existing same-origin APIs using browser sessions.
+The Worker injects the constrained [runtime bridge](public/__agentbridge-webmcp/bridge-v2.js), which calls the origin's existing same-origin APIs using the browser's authenticated session.
 
 ## 4. What is WebMCP?
 
@@ -22,23 +22,46 @@ Structured tools reduce ambiguous UI navigation and make errors, IDs, and state 
 
 ## 6. System Architecture
 
-Agent → Chromium WebMCP → Worker-injected bridge → Next.js API → services → Prisma → Neon. See [architecture](docs/webmcp-architecture.md).
+```text
+┌──────────────┐    HTTPS     ┌──────────────────────────────┐
+│ User / Agent │ ───────────► │ Cloudflare Worker            │
+│ in Chromium  │              │ worker/index.ts              │
+└──────┬───────┘              │ • proxies to origin          │
+       │                      │ • injects bridge-v2.js       │
+       │ WebMCP tools         └──────────────┬───────────────┘
+       ▼                                     │ proxied HTTPS
+┌──────────────┐                             ▼
+│ document.    │                  ┌──────────────────────────┐
+│ modelContext │◄─ bridge-v2.js ─►│ AgentBridge Next.js app  │
+└──────┬───────┘                  │ /api → services → Prisma │
+       │ tool call                 │ → Neon PostgreSQL        │
+       └──────────────────────────►└──────────────────────────┘
+```
+
+Connection details are defined in [wrangler.toml](wrangler.toml): `AGENTBRIDGE_ORIGIN` is the storefront target, [`worker/index.ts`](worker/index.ts) injects the bridge asset, and [`bridge-v2.js`](public/__agentbridge-webmcp/bridge-v2.js) registers tools with the browser. See the fuller [architecture document](docs/webmcp-architecture.md).
 
 ## 7. Agent ↔ Browser ↔ WebMCP Flow
 
-The browser discovers registered tools, invokes one with JSON arguments, and the bridge returns the origin API's structured result.
+1. The browser opens the Worker URL or a Cloudflare route mapped to that Worker.
+2. The Worker fetches the configured origin and injects `/__agentbridge-webmcp/bridge-v2.js` into HTML.
+3. The bridge calls `document.modelContext.registerTool` for permitted capabilities.
+4. The agent discovers a schema, invokes a tool with JSON arguments, and the bridge calls `/api/*` on the Worker origin.
+5. The Worker proxies the API request to the storefront; the storefront still performs authentication, validation, stock, ownership, and business-rule checks.
+6. The structured API result returns through the bridge to the agent; a state change is then visible in the website UI.
+
+The [deployment evidence](docs/webmcp-validation.md#v2-deployment-evidence) shows the Worker response, injected `bridge-v2.js` request, and protected anonymous cart request.
 
 ## 8. WebMCP Tools
 
-17 fixed tools cover catalog, cart, wishlist, orders, recommendations, and shipping. Checkout is intentionally not exposed.
+17 fixed tools cover catalog, cart, wishlist, orders, recommendations, and shipping. The canonical list is in [`src/registry/toolRegistry.ts`](src/registry/toolRegistry.ts); runtime definitions are in [`bridge-v2.js`](public/__agentbridge-webmcp/bridge-v2.js). Checkout is intentionally not exposed because the origin lacks an isolated payment sandbox.
 
 ## 9. Tool Discovery
 
-The bridge calls `document.modelContext.registerTool` only when WebMCP exists; normal visitors are unaffected.
+The bridge calls `document.modelContext.registerTool` only when WebMCP exists; normal visitors are unaffected. Inspect the live Worker [tool inventory endpoint](https://agentbridge--external-webmcp-api-adapter.mmisba221373.workers.dev/__agentbridge-webmcp/inspector) and follow the [browser validation guide](docs/webmcp-validation.md).
 
 ## 10. Tool Schemas & Contracts
 
-Schemas use required IDs, bounded quantities, enums, and structured failures. See [audit](docs/webmcp-audit.md).
+Schemas use required IDs, bounded quantities, enums, and structured failures. See the [audited contracts](docs/webmcp-audit.md), [TypeScript contract definitions](src/tools/index.ts), and [runtime validation implementation](public/__agentbridge-webmcp/bridge-v2.js).
 
 ## 11. Agent Interaction / User Journeys
 
@@ -62,11 +85,11 @@ Retry temporary errors only; ask the user to log in for authentication and corre
 
 ## 16. Testing Strategy
 
-Separate deterministic contracts, runtime bridge tests, browser E2E, and probabilistic LLM evaluation.
+Separate deterministic [contract tests](tests/tool-contracts.test.ts), [runtime bridge tests](tests/bridge-runtime.test.ts), [browser E2E](../AgentBridge--External-WebMCP-Powered-E-Commerce-Platform-API/tests/e2e/webmcp-cart.spec.ts), and [probabilistic LLM evaluation](evals/README.md).
 
 ## 17. Deterministic Tests
 
-`npm test` and `npm run test:webmcp` test registry/schemas, invalid inputs, cart-aware registration, and structured failures.
+`npm test` and `npm run test:webmcp` test registry/schemas, invalid inputs, cart-aware registration, and structured failures. See [final validation](docs/final-validation.md) for the recorded result.
 
 ## 18. LLM / Probabilistic Evaluations
 
@@ -74,11 +97,11 @@ Separate deterministic contracts, runtime bridge tests, browser E2E, and probabi
 
 ## 19. Browser / E2E Evaluations
 
-The storefront Playwright suite is configured for a disposable deployment and verifies tool-caused UI state changes.
+The storefront [Playwright journey](../AgentBridge--External-WebMCP-Powered-E-Commerce-Platform-API/tests/e2e/webmcp-cart.spec.ts) uses a disposable deployment and verifies tool-caused search, detail, cart add/remove, inspection, and visible UI state changes.
 
 ## 20. WebMCP Inspector Validation
 
-Browser evidence and the remaining Inspector checklist are in [validation](docs/webmcp-validation.md).
+Browser evidence and the remaining Inspector checklist are in [validation](docs/webmcp-validation.md), including the versioned [response screenshots](docs/evidence/).
 
 ## 21. Evaluation Metrics
 
@@ -90,11 +113,11 @@ Only generated evaluation output is a result. No LLM, v2-browser, or baseline me
 
 ## 23. Demo
 
-Discover tools, search, sign in with a disposable user, add a returned product ID, inspect cart, and verify the UI.
+Follow the [demo flow](docs/webmcp-final-report.md#reliable-demo-flow): open the Worker origin, discover tools, search, sign in with a disposable user, add a returned product ID, inspect the cart, and verify the UI.
 
 ## 24. Screenshots / Demo GIF / Video
 
-Capture post-deploy Inspector and header evidence under `docs/evidence/`; see the validation checklist.
+Current response captures are [Worker HTML](docs/evidence/worker-html-response.png), [bridge asset](docs/evidence/bridge-v2-asset-response.png), and [anonymous cart protection](docs/evidence/unauthenticated-cart-response.png). See the [validation checklist](docs/webmcp-validation.md) for remaining Inspector captures.
 
 ## 25. Tech Stack
 
@@ -102,11 +125,16 @@ Cloudflare Workers, TypeScript, WebMCP imperative API, Vitest, Playwright, Next.
 
 ## 26. Project Structure
 
-`worker/` proxies and injects; `public/` contains runtime bridge assets; `src/` contains contracts; `tests/` deterministic checks; `evals/` datasets/runner; `docs/` evidence.
+- [`worker/`](worker/) — Cloudflare proxy and HTML injection.
+- [`public/`](public/) — browser bridge assets served by Worker Assets.
+- [`src/`](src/) — typed tool contracts, safety rules, and executors.
+- [`tests/`](tests/) — deterministic registry and runtime checks.
+- [`evals/`](evals/) — generic datasets and provider runner.
+- [`docs/`](docs/) — audit, validation, reports, and evidence.
 
 ## 27. Setup & Installation
 
-Run `npm ci` in this repository, configure Worker variables, then deploy with Wrangler or Workers Builds.
+Run `npm ci`, set the origin in [wrangler.toml](wrangler.toml) or Cloudflare Worker variables, then deploy with `npx wrangler deploy` or [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/). The full isolated setup is in [webmcp-testing-environment.md](docs/webmcp-testing-environment.md).
 
 ## 28. Environment Variables
 
@@ -114,7 +142,7 @@ Run `npm ci` in this repository, configure Worker variables, then deploy with Wr
 
 ## 29. Running the Application
 
-Configure `wrangler.toml` with the isolated origin, then run `npx wrangler dev` or deploy through Cloudflare.
+Configure [`wrangler.toml`](wrangler.toml) with an origin you control, run `npx wrangler dev` for local proxy testing, or deploy through Cloudflare. Map a Cloudflare Worker route to the storefront domain only after confirming the Worker origin works; then verify the injected bridge request in [DevTools](docs/webmcp-validation.md#v2-deployment-evidence).
 
 For a seeded local demo origin, use `customer@example.com` or `admin@example.com` with `ChangeMe123!`. These are public seed credentials only; replace them for every non-demo deployment. The authoritative setup notes are in the storefront repository.
 
