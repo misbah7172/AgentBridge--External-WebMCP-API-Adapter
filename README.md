@@ -116,6 +116,8 @@ Run `npm ci` in this repository, configure Worker variables, then deploy with Wr
 
 Configure `wrangler.toml` with the isolated origin, then run `npx wrangler dev` or deploy through Cloudflare.
 
+For a seeded local demo origin, use `customer@example.com` or `admin@example.com` with `ChangeMe123!`. These are public seed credentials only; replace them for every non-demo deployment. The authoritative setup notes are in the storefront repository.
+
 ## 30. Running Tests
 
 Run `npm test`, `npm run test:webmcp`, and from the storefront `npm run test:e2e`.
