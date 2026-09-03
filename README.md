@@ -22,7 +22,7 @@ Structured tools reduce ambiguous UI navigation and make errors, IDs, and state 
 
 ## 6. System Architecture
 
-Agent → Chromium WebMCP → Worker-injected bridge → Next.js API → services → Prisma → Neon. See [architecture](C:/CODE/agentbridge-webmcp-adapter/docs/webmcp-architecture.md).
+Agent → Chromium WebMCP → Worker-injected bridge → Next.js API → services → Prisma → Neon. See [architecture](docs/webmcp-architecture.md).
 
 ## 7. Agent ↔ Browser ↔ WebMCP Flow
 
@@ -38,7 +38,7 @@ The bridge calls `document.modelContext.registerTool` only when WebMCP exists; n
 
 ## 10. Tool Schemas & Contracts
 
-Schemas use required IDs, bounded quantities, enums, and structured failures. See [audit](C:/CODE/agentbridge-webmcp-adapter/docs/webmcp-audit.md).
+Schemas use required IDs, bounded quantities, enums, and structured failures. See [audit](docs/webmcp-audit.md).
 
 ## 11. Agent Interaction / User Journeys
 
@@ -46,7 +46,7 @@ Search → details; search → add to cart → inspect cart; inspect cart → re
 
 ## 12. State-Aware Tool Exposure
 
-Cart mutation tools register after a populated cart is detected or an add succeeds. See [state model](C:/CODE/agentbridge-webmcp-adapter/docs/webmcp-state-model.md).
+Cart mutation tools register after a populated cart is detected or an add succeeds. See [state model](docs/webmcp-state-model.md).
 
 ## 13. Error Handling & Safety
 
@@ -58,7 +58,7 @@ Tool outputs include IDs and cart state needed by the next step; callers must st
 
 ## 15. Failure & Recovery Handling
 
-Retry temporary errors only; ask the user to log in for authentication and correct invalid IDs. See [failure modes](C:/CODE/agentbridge-webmcp-adapter/docs/webmcp-failure-modes.md).
+Retry temporary errors only; ask the user to log in for authentication and correct invalid IDs. See [failure modes](docs/webmcp-failure-modes.md).
 
 ## 16. Testing Strategy
 
@@ -78,7 +78,7 @@ The storefront Playwright suite is configured for a disposable deployment and ve
 
 ## 20. WebMCP Inspector Validation
 
-Historical browser evidence and the required v2 recapture checklist are in [validation](C:/CODE/agentbridge-webmcp-adapter/docs/webmcp-validation.md).
+Browser evidence and the remaining Inspector checklist are in [validation](docs/webmcp-validation.md).
 
 ## 21. Evaluation Metrics
 
@@ -126,7 +126,7 @@ Set a provider key and run `npm run eval:webmcp`; JSON and Markdown results appe
 
 ## 32. Reproducibility
 
-Use the isolated environment and exact commands in [testing environment](C:/CODE/agentbridge-webmcp-adapter/docs/webmcp-testing-environment.md).
+Use the isolated environment and exact commands in [testing environment](docs/webmcp-testing-environment.md).
 
 ## 33. Security Considerations
 
@@ -150,8 +150,4 @@ The project supplies audited browser-native tools, state/safety documentation, d
 
 ## 38. License
 
-No license has been declared.
-
-## 39. Contributors
-
-Misbah and project contributors.
+Distributed under the [MIT License](LICENSE).
