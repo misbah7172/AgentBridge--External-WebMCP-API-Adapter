@@ -136,6 +136,14 @@ Cloudflare Workers, TypeScript, WebMCP imperative API, Vitest, Playwright, Next.
 
 Run `npm ci`, set the origin in [wrangler.toml](wrangler.toml) or Cloudflare Worker variables, then deploy with `npx wrangler deploy` or [Workers Builds](https://developers.cloudflare.com/workers/ci-cd/builds/). The full isolated setup is in [webmcp-testing-environment.md](docs/webmcp-testing-environment.md).
 
+## Live Worker endpoint
+
+Use the Worker URL below for the WebMCP demonstration:
+
+<https://agentbridge--external-webmcp-api-adapter.mmisba221373.workers.dev/>
+
+This Worker is working and proxies the Vercel-hosted storefront configured by `AGENTBRIDGE_ORIGIN`, injecting `bridge-v2.js` into HTML responses. The Worker is not currently configured to serve through the registered `misba.ninja` domain because that domain's Worker route registration is unresolved. Use the Worker URL above, not the Vercel website URL or `misba.ninja`, when testing WebMCP tool discovery and execution.
+
 ## 28. Environment Variables
 
 `AGENTBRIDGE_ORIGIN`, `E2E_BASE_URL`, `E2E_EMAIL`, `E2E_PASSWORD`, and optional `OPENAI_API_KEY`, `LLM_EVAL_MODEL`, `LLM_EVAL_TRIALS`. Never commit secrets.
